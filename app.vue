@@ -1,5 +1,5 @@
 <template>
-    <div id="teleport">
+    <div>
         <NuxtLayout>
             <NuxtPage/>
         </NuxtLayout>
@@ -7,7 +7,7 @@
 
 </template>
 <style>
-@import 'element-plus/dist/index.css';
+
 </style>
 <script setup>
 </script>

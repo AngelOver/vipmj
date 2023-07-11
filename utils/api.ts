@@ -232,3 +232,96 @@ export const send_siwei_html = () => {
 export const weixin_login = () => {
     return Http.post('api/socials/wechat')
 }
+
+export const get_avatar_preset = () => {
+    return Http.post('api/get_avatar_preset')
+}
+
+export const c_avatar_session = (params:any) => {
+    return Http.post('api/c_avatar_session',params)
+}
+export const wechat_login_url = (params:any) => {
+    return Http.post('api/socials/wechat',params)
+}
+
+
+export const get_consum_limit = () => {
+    return Http.post('api/get_consum_limit')
+}
+export const wechat_login_status = (params:any) => {
+    return Http.post('api/wechat_login_status',params)
+}
+
+export const wechat_bind_status = (params:any) => {
+    return Http.post('api/wechat_bind_status',params)
+}
+
+export const generatePdf = (params:any) => {
+    return Http.post('api/generatePdf',params)
+}
+
+export const gptpdf_generate = (params:any) => {
+    return Http.post('api/gptpdf_generate',params)
+}
+
+export const pdf_message = (params:any) => {
+    return Http.post('api/pdf_message',params)
+}
+
+export const pdf_message_all = (params:any) => {
+    return Http.post('api/pdf_message_all',params)
+}
+export const pdf_message_search = (params:any) => {
+    return Http.post('api/pdf_message_search',params)
+}
+
+export const pdf_message_check = (params:any) => {
+    return Http.post('api/pdf_message_check',params)
+}
+
+
+export const pdf_listdel_all = () => {
+    return Http.post('api/pdf_listdel_all')
+}
+export const pdf_scene = () => {
+    return Http.post('api/pdf_scene')
+}
+
+export const get_pdf_limit = () => {
+    return Http.post('api/get_pdf_limit')
+}
+
+export const pdf_message_delete = (params:any) => {
+    return Http.post('api/pdf_message_delete',params)
+}
+export const c_pdf_title = (params:any) => {
+    return Http.post('api/c_pdf_title',params)
+}
+
+export const get_nowContent = () => {
+    return Http.post('api/get_nowContent')
+}
+
+export const get_allContent = () => {
+    return Http.post('api/get_allContent')
+}
+
+export const save_content = (params:any) => {
+    return Http.post('api/save_content',params)
+}
+
+export const get_content = (params:any) => {
+    return Http.post('api/get_content',params)
+}
+
+export const delete_content = (params:any) => {
+    return Http.post('api/delete_content',params)
+}
+
+export const rename_content = (params:any) => {
+    return Http.post('api/rename_content',params)
+}
+
+export const delete_message = (params:any) => {
+    return Http.post('api/delete_message',params)
+}

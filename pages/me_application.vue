@@ -3,39 +3,27 @@
         <div class="w-full bg-slate-50 pb-20 pt-10">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <h3 class="mb-4">我的收藏</h3>
-
-                <div class="flex" v-show="loadings">
-                    <el-skeleton class="mr-4 relative col-span-1 flex flex-col justify-between divide-y divide-gray-200 rounded-lg text-center " v-for="sk in 4" animated>
-                        <template #template >
-                            <el-skeleton-item variant="image" class="w-100-svg flex flex-1 flex-col p-8"/>
-                            <div class="pt-1 pb-1">
-                                <div
-                                    style="
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: space-between;
-                                      "
-                                >
-                                    <el-skeleton-item variant="text" style="width:45%" />
-                                    <el-skeleton-item variant="text" style="width:45%" />
-                                </div>
-                            </div>
-                        </template>
-                    </el-skeleton>
-                </div>
+                <a-row v-show="loadings">
+                    <a-col :span="6" v-for="sk in 4">
+                        <a-skeleton animation
+                                    class="mr-4 relative col-span-1 flex flex-col justify-between divide-y divide-gray-200 rounded-lg text-center ">
+                            <a-skeleton-shape size="large" class="w-100 pb-56 flex flex-1 flex-col p-8"/>
+                        </a-skeleton>
+                    </a-col>
+                </a-row>
                 <ul role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
 
 
                     <li v-for="(item,index) in applications" v-if="!loadings" :key="index"
                         class="relative col-span-1 flex flex-col justify-between divide-y divide-gray-200 rounded-lg bg-white text-center shadow">
                         <div class="absolute top-5 right-5 cursor-pointer">
-                            <el-icon class="fs-5 hover:text-yellow-600" @click="ai_collect_send(item.ai_application[0].id)"><Star /></el-icon>
+                            <icon-star class="fs-5 hover:text-yellow-600" @click="ai_collect_send(item.ai_application[0].id)"/>
                         </div>
                         <NuxtLink :to="'/app/'+item.ai_application[0].id">
                             <div class="flex flex-1 flex-col p-8">
                                 <div
                                     class="mx-auto flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-full  text-3xl">
-                                    <el-image class="w-100 h-100" :src="item.ai_application[0].icon" alt="" />
+                                    <a-image class="w-100 h-100" :src="item.ai_application[0].icon" alt="" />
                                 </div>
                                 <h3 class="mt-6 text-sm font-medium text-gray-900">{{ item.ai_application[0].title }}</h3>
                                 <dl class="mt-1 flex flex-grow flex-col justify-between">
@@ -82,19 +70,17 @@
                         </div>
                     </li>
                 </ul>
-                <el-empty class="m-auto w-100" v-show="applications.length==0 && !loadings" description="暂无应用"></el-empty>
+                <a-empty class="m-auto w-100" v-show="applications.length==0 && !loadings" description="暂无应用"></a-empty>
 
                 <div class="mt-10 flex justify-center">
 
-                    <el-pagination
-                        :current-page="page"
+                    <a-pagination
+                        :current="page"
                         :page-size="limit"
-                        :pager-count="4"
                         class="mr-4 ml-4"
                         background
-                        layout="prev, pager, next"
                         :total="app_count"
-                        @current-change="get_more"
+                        @change="get_more"
                     />
                 </div>
             </div>
@@ -128,8 +114,9 @@
 
 <script setup lang="ts">
 import {ref} from "vue";
-import {ElMessage} from 'element-plus'
+import {Message} from '@arco-design/web-vue'
 import {useCounter} from "~/store/counter";
+import {IconStar} from "@arco-design/web-vue/es/icon";
 definePageMeta({
     middleware: ['islogin']
 })
@@ -177,7 +164,7 @@ const like_send = (id:string)=>{
         id:id
     }).then((res:any)=>{
         get_all()
-        ElMessage.success(res._rawValue.message)
+        Message.success(res._rawValue.message)
     }).catch((err:any)=>{
         console.log(err)
     })
@@ -197,7 +184,7 @@ const ai_collect_send = (id:string)=>{
         id:id
     }).then((res:any)=>{
         get_all()
-        ElMessage.success(res._rawValue.message)
+        Message.success(res._rawValue.message)
     }).catch((err:any)=>{
         console.log(err)
     })

@@ -95,7 +95,7 @@ function onLoad (url: string, i: number) {
     })
 }
 async function onPreload () { // 计算图片宽高和位置（top，left）
-                              // 计算每列的图片宽度
+    // 计算每列的图片宽度
     imageWidth.value = (waterfall.value.offsetWidth - (props.columnCount + 1) * props.columnGap) / props.columnCount
     const len = props.images.length
     imagesProperty.value.splice(len)
@@ -104,39 +104,70 @@ async function onPreload () { // 计算图片宽高和位置（top，left）
         await onLoad(props.images[i].image, i)
     }
 }
+const visible1 = ref(false)
+import {IconDownload,IconInfoCircle} from '@arco-design/web-vue/es/icon'
+const onDownLoad = (imgsrc:any)=>{
+    // 下载当前图片
+    const image = new Image()
+    image.src = imgsrc
+    image.onload = function () {
+        const a = document.createElement('a')
+        a.href = imgsrc
+        a.download = '图片'
+        a.click()
+    }
+}
 </script>
 <template>
     <div v-if="mode==='JS'" v-bind="$attrs" class="m-waterfall-js" ref="waterfall" :style="` width: ${totalWidth}; height: ${height}px;`">
-        <div class="item"
-             v-for="(property, index) in imagesProperty"
-             :key="index">
+        <client-only>
+            <a-image-preview-group infinite>
+                <div class="item"
+                     v-for="(property, index) in imagesProperty"
+                     :key="index">
 
-                    <el-image
-                        class="u-img"
-
-                        :style="`width: ${imageWidth}px;margin-top:20px;top: ${property && property.top}px; left: ${property && property.left}px;`"
+                    <a-image
+                        class="u-img cursor-pointer"
+                        :style="`width: ${imageWidth}px;top: ${property && property.top}px; left: ${property && property.left}px;`"
                         :src="images[index].image"
                         :zoom-rate="1.2"
                         :preview-src-list="all_images"
                         fit="fill"
-                        :initial-index="index"
+                        :title="images[index].title"
+                        :preview-visible="visible1"
+                        @preview-visible-change="() => { visible1= false }"
+                    >
+                        <template #extra>
+                            <div class="actions">
+                                <span class="action" @click="onDownLoad(images[index].image)"><icon-download /></span>
+                                <a-tooltip :content="images[index].title">
+                                    <span class="action ml-1"><icon-info-circle /></span>
+                                </a-tooltip>
+                            </div>
+                        </template>
+                        <template #loader>
+                            <img
+                                src="@/assets/images/pic_load.png"
+                            />
+                        </template>
+                    </a-image>
 
+                    <!--<div style="padding: 10px 0px" :style="`color:#fff;padding-left:10px;top: ${property && property.top+property.height-20}px; left: ${property && property.left}px;`" class="me_show_pic absolute">-->
+                    <!--    <a-tooltip-->
+                    <!--        class="box-item"-->
+                    <!--        effect="dark"-->
+                    <!--        :content=images[index].title-->
+                    <!--        placement="bottom"-->
+                    <!--    >-->
+                    <!--        <span                         :style="`width: ${imageWidth-40}px;`"-->
+                    <!--        >{{ images[index].title }}</span>-->
+                    <!--    </a-tooltip>-->
 
-                    />
-            <div style="padding: 10px 0px" :style="`color:#fff;padding-left:10px;top: ${property && property.top+property.height-20}px; left: ${property && property.left}px;`" class="me_show_pic absolute">
-                <el-tooltip
-                    class="box-item"
-                    effect="dark"
-                    :content=images[index].title
-                    placement="bottom"
-                >
-                    <span                         :style="`width: ${imageWidth-40}px;`"
-                    >{{ images[index].title }}</span>
-                </el-tooltip>
+                    <!--</div>-->
+                </div>
+            </a-image-preview-group>
 
-            </div>
-        </div>
-
+        </client-only>
     </div>
     <div v-if="mode==='CSS'" v-bind="$attrs" class="m-waterfall-css" :style="`background: ${backgroundColor}; width: ${totalWidth}; padding: ${columnGap}px; column-count: ${columnCount}; column-gap: ${columnGap}px;`">
         <div class="m-img" :style="`margin-bottom: ${columnGap}px;`" v-for="(item, index) in images" :key="index">

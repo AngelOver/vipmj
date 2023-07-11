@@ -1,10 +1,9 @@
 <template>
-    <div id="layout" class="theme-cyan">
-        <div class="navigation navbar justify-content-center py-xl-4 py-md-3 py-0 px-2">
+    <div id="layout" class="layout-demo">
             <Navigation />
-        </div>
-        <slot />
+        <slot></slot>
         <Footer />
     </div>
-
 </template>
+<script setup>
+</script>

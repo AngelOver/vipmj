@@ -3,7 +3,7 @@
         <Head>
             <Title>{{ info.title }} - {{counter.setting.title}}</Title>
         </Head>
-        <div class="w-full bg-slate-50 pb-20">
+        <div class="w-full pb-20">
             <div class="mx-auto max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">
                 <nav class="flex" aria-label="Breadcrumb">
                     <ol role="list" class="flex items-center space-x-4">
@@ -25,25 +25,29 @@
                     <main class="mt-12 flex w-full flex-1 flex-col items-center justify-center px-4  sm:mt-20"><h1
                         class="max-w-[708px] text-4xl font-bold text-slate-900 sm:text-6xl">{{ info.title }}</h1>
                         <p class="mt-6 text-lg leading-8 text-gray-600">{{ info.description }}</p>
-                        <div class="flex w-full max-w-xl flex-col items-center"><textarea rows="4"
-                                                                                          v-model="code"
-                                                                                          :disabled="send_loading"
-                                                                                          class="my-5 w-full p-2 rounded-md border-gray-300 shadow-sm focus:border-black focus:ring-black"
-                                                                                          placeholder="请输入点什么吧~"
-                                                                                          data-dl-input-translation="true"></textarea>
+                        <div class="flex w-full max-w-xl flex-col items-center">
+                            <a-textarea
+                                        :auto-size="{ minRows: 3, maxRows: 12 }"
+                                        v-model="code"
+                                        :disabled="send_loading"
+                                        class="mt-5"
+                                        allow-clear
+                                        show-word-limit
+                                        placeholder="请输入点什么吧~"
+                            ></a-textarea>
                             <div class="flex gap-4 self-end">
 <!--                                <button type="button"-->
 <!--                                        class="mx-atuo mt-8 rounded-xl border bg-white px-8 py-2 font-medium text-black hover:bg-gray-200/80 sm:mt-10">-->
 <!--                                    收藏-->
 <!--                                </button>-->
-                                <el-button type="primary"
+                                <a-button type="primary"
                                            size="large"
                                            round
                                            @click="run_app()"
                                            :loading="send_loading"
                                         class="mx-atuo mt-8 rounded-xl bg-black px-8 py-2 font-medium text-white hover:bg-black/80 sm:mt-10">
                                     运行
-                                </el-button>
+                                </a-button>
                             </div>
                             <div class="my-10 w-full space-y-10 bg-white rounded p-3 shadow-sm" v-if="last_content" v-html="renderMarkdown(last_content).replace(/\\n/g, '\n')">
 
@@ -83,7 +87,7 @@
 
 <script setup lang="ts">
 import {ref} from "vue";
-import {ElMessage} from "element-plus";
+import {Message} from "@arco-design/web-vue";
 import hljs from 'highlight.js'
 import markdownIt from 'markdown-it'
 import {get_app_qs} from "~/utils/api";
@@ -147,25 +151,29 @@ const run_app = async ()=>{
         }),
 
     })
-
+    if (code.value.length==''){
+        send_loading.value = false
+        Message.error('内容不得为空')
+        return false
+    }
     if (res.status==500){
         send_loading.value = false
-        ElMessage.error('服务器错误')
+        Message.error('服务器错误')
         return false
     }
     if (res.status==401){
         send_loading.value = false
-        ElMessage.error('请先登录')
+        Message.error('请先登录')
         return false
     }
     if (res.status==402){
         send_loading.value = false
-        ElMessage.error('发送次数已达上限或余额不足')
+        Message.error('发送次数已达上限或余额不足')
         return false
     }
     if (res.status==403){
         send_loading.value = false
-        ElMessage.error('禁止发送违禁词')
+        Message.error('禁止发送违禁词')
         return false
     }
     const stream = res.body?.getReader();

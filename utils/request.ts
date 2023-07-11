@@ -1,4 +1,4 @@
-import { ElMessage } from 'element-plus'
+import { Message } from '@arco-design/web-vue'
 const fetch = (url: string, options?: any): Promise<any>  => {
     const token = useCookie("token");
     const headers = { // headers信息
@@ -11,9 +11,9 @@ const fetch = (url: string, options?: any): Promise<any>  => {
 
             if (!data._rawValue) {
                 if(error.value.status==500){
-                    ElMessage.error("服务器错误")
+                    Message.error("服务器错误")
                 }else{
-                    ElMessage.error(error.value.data.message)
+                    Message.error(error.value.data.message)
                 }
 
                 // 这里处理错误回调

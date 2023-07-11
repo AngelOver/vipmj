@@ -1,55 +1,61 @@
 <template>
-    <el-dialog v-model="login_dialog" class="mb_dialog dialog_login_of" append-to-body>
-            <el-dialog
-                v-model="check_dialog"
+    <a-modal :footer=false v-model:visible="login_dialog" simple class="mb_dialog dialog_login_of">
+        <a-modal
+                v-model:visible="check_dialog"
                 :title="agreement.title"
                 class="dialog_login_of"
             >
-                <div v-html="agreement.description"></div>
+            <a-skeleton :animation="agreement_load" v-if="agreement_load">
+                <a-space direction="vertical" :style="{width:'100%'}" size="large">
+                    <a-skeleton-line :rows="3" />
+                </a-space>
+            </a-skeleton>
+                <div v-html="agreement.description" v-else></div>
                 <template #footer>
                                       <span class="dialog-footer">
-                                        <el-button type="primary" @click="check_dialog_change()">
+                                        <a-button type="primary" @click="check_dialog_change()">
                                             同意协议
-                                        </el-button>
+                                        </a-button>
                                       </span>
                 </template>
-            </el-dialog>
+            </a-modal>
         <div class="w-100 dialog_login">
             <!--login-->
-            <div v-if="is_login_card" class="card border-0">
+            <div v-if="is_login_card" class="card login_card border-0">
                 <div class="card-body">
-
-                    <h3 class="text-center">登录</h3>
+                    <img src="@/assets/images/safe_login.png" alt="" class="w-28 m-auto mb-2">
 
                     <p class="text-center mb-6">登录自主用户，开始聊天</p>
-                    <el-form ref="ruleFormRefLogin" :model="ruleFormLogin" :rules="rulesLogin" class="demo-ruleForm"
-                        status-icon>
-                        <el-form-item prop="email">
-                                <el-input type="email" size="large" v-model="ruleFormLogin.email"
+                    <a-form  ref="ruleFormRefLogin" :model="ruleFormLogin" class="demo-ruleForm"
+                        status-icon @submit="submitFormLogin">
+                        <a-form-item :hide-label=true field="email"
+                                     :rules="[{required:true,message:'邮箱或手机号不得为空'}]">
+                                <a-input  v-model="ruleFormLogin.email"
                                     placeholder="输入你的邮箱/手机号">
                                     <template #prefix>
-                                        <el-icon><User /></el-icon>
+                                        <icon-user />
                                     </template>
-                                </el-input>
-                        </el-form-item>
-                        <el-form-item prop="password">
-                                <el-input type="password" size="large" v-model="ruleFormLogin.password"
+                                </a-input>
+                        </a-form-item>
+                        <a-form-item :hide-label=true field="password"
+                                     :rules="[{required:true,message:'密码不得为空'},
+                                     {minLength:6,message:'必须输入大于6个字符'}]"
+                        >
+                                <a-input-password   v-model="ruleFormLogin.password"
                                     placeholder="输入你的密码">
                                     <template #prefix>
-                                        <el-icon><Lock /></el-icon>
+                                        <icon-lock />
                                     </template>
-                                </el-input>
-                        </el-form-item>
-                        <div class="form-group d-flex justify-content-between mb-4">
+                                </a-input-password>
+                        </a-form-item>
+                        <div class="form-group d-flex justify-content-between mb-2">
                             <NuxtLink class="link" href="/users/reset">忘记密码</NuxtLink>
                         </div>
-                        <el-form-item>
-                            <el-button :loading="login_loading" size="large" type="primary"
-                                @click="submitFormLogin(ruleFormRefLogin)" class="login">
-                                登录
-                            </el-button>
-                        </el-form-item>
-                    </el-form>
+                        <a-button :loading="login_loading"  type="primary"
+                                  html-type="submit" class="login mb-2">
+                            登录
+                        </a-button>
+                    </a-form>
                     <div class="mt-6" v-if="counter.setting.three_login_open=='1'">
                         <div class="relative">
                             <div class="absolute inset-0 flex items-center">
@@ -80,156 +86,160 @@
                     </p>
                 </div>
             </div>
-            <!--register-->
-            <div v-else class="card border-0">
+            <!--wechat_login-->
+            <div class="card login_card border-0" v-else-if="wx_login_is">
                 <div class="card-body">
+                    <img src="@/assets/images/wechat.png" alt="" class="m-auto mb-2">
 
-                    <h3 class="text-center">注册</h3>
-
+                    <p class="text-center mb-6">打开微信[扫一扫]登录</p>
+                    <a-image :src="wx_ewm" alt=""/>
+                </div>
+                <NuxtLink @click="go_login" class="text-center cursor-pointer">返回登录</NuxtLink>
+            </div>
+            <!--register-->
+            <div v-else class="card register_card border-0">
+                <div class="card-body">
+                    <img src="@/assets/images/safe_login.png" alt="" class="w-28 m-auto mb-2">
                     <p class="text-center mb-6">创建一个免费账户</p>
-                    <el-tabs v-model="activeName" class="demo-tabs reg_demo_tabs">
-                        <el-tab-pane label="邮箱注册" name="first" v-if="reg_way == '1' || reg_way == '3'">
-                            <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon>
-                                <el-form-item prop="name">
-                                    <el-input type="text" size="large" v-model="ruleForm.name" placeholder="填写您的用户名">
+                    <a-tabs type="capsule" v-model="activeName" class="demo-tabs reg_demo_tabs">
+                        <a-tab-pane title="邮箱注册" key="first" v-if="reg_way == '1' || reg_way == '3'">
+                            <a-form ref="ruleFormRef" :model="ruleForm" :rules="rules" class="demo-ruleForm" status-icon @submit="submitForm">
+                                <a-form-item :hide-label=true
+                                             :hide-asterisk=true
+                                             field="email"
+                                >
+                                    <a-input  v-model="ruleForm.email" placeholder="请填写您的邮箱">
                                         <template #prefix>
-                                            <el-icon>
-                                                <User />
-                                            </el-icon>
+                                            <icon-email />
                                         </template>
-                                    </el-input>
-                                </el-form-item>
-                                <el-form-item prop="email">
-                                    <el-input type="email" size="large" v-model="ruleForm.email" placeholder="请填写您的邮箱">
-                                        <template #prefix>
-                                            <svg t="1682921458000" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                                                xmlns="http://www.w3.org/2000/svg" p-id="3552" width="16" height="16">
-                                                <path
-                                                    d="M875.52 189.44c11.1104 0 20.48 9.3696 20.48 20.48v604.16c0 11.1104-9.3696 20.48-20.48 20.48H148.48c-11.1104 0-20.48-9.3696-20.48-20.48V209.92c0-11.1104 9.3696-20.48 20.48-20.48h727.04m0-40.96H148.48c-33.792 0-61.44 27.648-61.44 61.44v604.16c0 33.792 27.648 61.44 61.44 61.44h727.04c33.792 0 61.44-27.648 61.44-61.44V209.92c0-33.792-27.648-61.44-61.44-61.44z"
-                                                    fill="#cdcdcd" p-id="3553"></path>
-                                                <path
-                                                    d="M834.4576 245.6064c-3.2768 0-6.5536 0.768-9.6256 2.4064L512 416.0512 199.168 248.064a20.3264 20.3264 0 0 0-9.6256-2.4064c-7.3216 0-14.4384 3.8912-18.1248 10.752-5.3248 9.9328-1.5872 22.4256 8.3456 27.7504L502.272 457.3184c3.072 1.6384 6.3488 2.304 9.6256 2.304h0.2048c3.2768 0 6.5536-0.6656 9.6256-2.304l322.5088-173.2096c9.9328-5.3248 13.6704-17.8176 8.3456-27.7504a20.63872 20.63872 0 0 0-18.1248-10.752z"
-                                                    fill="#cdcdcd" p-id="3554"></path>
-                                            </svg>
-                                        </template>
-                                    </el-input>
-                                </el-form-item>
-                                <el-form-item prop="email_code">
-                                    <el-input type="email" size="large" v-model="ruleForm.email_code"
-                                        placeholder="请填写您的邮箱验证码">
-                                        <template #prefix>
-                                            <el-icon><Filter /></el-icon>
-                                        </template>
-                                        <template #append>
-                                            <el-button :loading="send_wait" class="flex" type="primary"
-                                                @click="send_code()">
-                                                {{ send_code_text }}
-                                            </el-button>
-                                        </template>
-
-                                    </el-input>
+                                    </a-input>
+                                </a-form-item>
+                                <a-form-item :hide-label=true
+                                             :hide-asterisk=true
+                                             field="email_code"
+                                             >
+                                    <a-space>
+                                        <a-input  v-model="ruleForm.email_code"
+                                                 placeholder="邮箱验证码">
+                                            <template #prefix>
+                                                <icon-code />
+                                            </template>
 
 
-                                </el-form-item>
-                                <el-form-item prop="password">
-                                    <el-input type="password" size="large" v-model="ruleForm.password" placeholder="填写您的密码">
+                                        </a-input>
+                                        <a-button :loading="send_wait" type="primary"
+                                                  @click="send_code()">
+                                            {{ send_code_text }}
+                                        </a-button>
+                                    </a-space>
+
+
+                                </a-form-item>
+                                <a-form-item :hide-label=true
+                                             :hide-asterisk=true
+                                             field="password"
+                                             >
+                                    <a-input-password   v-model="ruleForm.password" placeholder="填写您的密码">
                                         <template #prefix>
-                                            <el-icon><Lock /></el-icon>
+                                            <icon-lock />
                                         </template>
 
-                                    </el-input>
-                                </el-form-item>
-                                <el-form-item prop="invite_code" class="mb-0">
-                                    <el-input type="invite_code" size="large" v-model="ruleForm.invite_code"
+                                    </a-input-password>
+                                </a-form-item>
+                                <a-form-item :hide-label=true
+                                             :hide-asterisk=true
+                                             field="invite_code" class="mb-2">
+                                    <a-input  v-model="ruleForm.invite_code"
                                         placeholder="填写您的邀请码（可选）">
                                         <template #prefix>
-                                            <el-icon><Position /></el-icon>
+                                            <icon-message />
                                         </template>
-                                    </el-input>
-                                </el-form-item>
-                                <el-form-item prop="check_xieyi" class="mb-0 mt-0">
-                                    <el-checkbox type="check_xieyi" v-model="ruleForm.check_xieyi" @click="check_dialog=true">
+                                    </a-input>
+                                </a-form-item>
+                                <a-form-item :hide-label=true
+                                             :hide-asterisk=true
+                                             field="check_xieyi" class="mb-2 mt-0">
+                                    <a-checkbox type="check_xieyi" v-model="ruleForm.check_xieyi" @click="check_agree_dialog()">
                                         同意《用户协议》
-                                    </el-checkbox>
-                                </el-form-item>
-                                <el-form-item>
-                                    <el-button type="primary" :loading="reg_loading" class="register" size="large"
-                                        @click="submitForm(ruleFormRef)">
-                                        注册
-                                    </el-button>
-                                </el-form-item>
-                            </el-form>
-                        </el-tab-pane>
-                        <el-tab-pane label="手机注册" name="second" v-if="reg_way == '2' || reg_way == '3'">
-                            <el-form ref="ruleFormRefs" :model="TruleForm" :rules="rulest" class="demo-ruleForm"
+                                    </a-checkbox>
+                                </a-form-item>
+                                <a-button type="primary" :loading="reg_loading" class="register w-100 mb-2"
+                                          html-type="submit">
+                                    注册
+                                </a-button>
+                            </a-form>
+                        </a-tab-pane>
+                        <a-tab-pane title="手机注册" key="second" v-if="reg_way == '2' || reg_way == '3'">
+                            <a-form ref="ruleFormRefs" :model="TruleForm" :rules="rulest"  class="demo-ruleForm"
+                                    @submit="submitFormS"
                                 status-icon>
-                                <el-form-item prop="name">
-
-                                        <el-input type="text" v-model="TruleForm.name"
-                                            placeholder="填写您的用户名"
-                                            size="large"
+                                <a-form-item :hide-label=true
+                                             :hide-asterisk=true
+                                             field="phone">
+                                        <a-input v-model="TruleForm.phone"
+                                            placeholder="请填写您的手机号"
                                             >
                                             <template #prefix>
-                                                <el-icon><User /></el-icon>
+                                                <icon-mobile />
                                             </template>
-                                        </el-input>
-                                </el-form-item>
-                                <el-form-item prop="phone">
-                                        <el-input type="phone" v-model="TruleForm.phone"
-                                            placeholder="请填写您的手机号"
-                                            size="large">
+                                        </a-input>
+                                </a-form-item>
+                                <a-form-item :hide-label=true
+                                             :hide-asterisk=true
+                                             field="phone_code">
+                                    <a-space>
+                                        <a-input
+                                                 v-model="TruleForm.phone_code"
+                                                 placeholder="请填写您的手机验证码"
+                                        >
                                             <template #prefix>
-                                                <el-icon><Phone /></el-icon>
+                                                <icon-code />
                                             </template>
-                                        </el-input>
-                                </el-form-item>
-                                <el-form-item prop="phone_code">
-                                            <el-input type="phone_code"
-                                                v-model="TruleForm.phone_code" placeholder="请填写您的手机验证码"
-                                                size="large">
-                                                <template #prefix>
-                                                    <el-icon><Filter /></el-icon>
-                                                </template>
-                                                <template #append>
-                                                    <el-button :loading="send_wait" type="primary"
-                                                        class="flex" @click="send_p_code()">
-                                                        {{ send_code_text }}</el-button>
-                                                </template>
-                                            </el-input>
-                                </el-form-item>
-                                <el-form-item prop="password">
-                                        <el-input type="password"
-                                            v-model="TruleForm.password" placeholder="填写您的密码"
-                                            size="large">
-                                            <template #prefix>
-                                                <el-icon><Lock /></el-icon>
-                                            </template>
-                                        </el-input>
-                                </el-form-item>
-                                <el-form-item prop="invite_code" class="mb-0">
-                                        <el-input type="invite_code"
-                                            v-model="TruleForm.invite_code" placeholder="填写您的邀请码（可选）"
-                                            size="large">
-                                            <template #prefix>
-                                                <el-icon><Position /></el-icon>
-                                            </template>
-                                        </el-input>
-                                </el-form-item>
-                                <el-form-item prop="check_xieyi" class="mb-0 mt-0">
-                                    <el-checkbox  v-model="TruleForm.check_xieyi" @click="check_dialog=true">
-                                        同意《用户协议》
-                                    </el-checkbox>
-                                </el-form-item>
 
-                                <el-form-item>
-                                    <el-button type="primary" :loading="reg_loading" class="register" size="large"
-                                        @click="submitFormS(ruleFormRefs)">
-                                        注册
-                                    </el-button>
-                                </el-form-item>
-                            </el-form>
-                        </el-tab-pane>
-                    </el-tabs>
+                                        </a-input>
+                                        <a-button :loading="send_wait" type="primary" @click="send_p_code()">
+                                            {{ send_code_text }}
+                                        </a-button>
+                                    </a-space>
+
+                                </a-form-item>
+                                <a-form-item :hide-label=true
+                                             :hide-asterisk=true
+                                             field="password">
+                                        <a-input-password
+                                            v-model="TruleForm.password" placeholder="填写您的密码"
+                                            >
+                                            <template #prefix>
+                                                <icon-lock />
+                                            </template>
+                                        </a-input-password>
+                                </a-form-item>
+                                <a-form-item :hide-label=true
+                                             :hide-asterisk=true
+                                             field="invite_code" class="mb-2">
+                                        <a-input
+                                            v-model="TruleForm.invite_code" placeholder="填写您的邀请码（可选）"
+                                            >
+                                            <template #prefix>
+                                                <icon-message />
+                                            </template>
+                                        </a-input>
+                                </a-form-item>
+                                <a-form-item :hide-label=true
+                                             :hide-asterisk=true
+                                             field="check_xieyi" class="mb-2 mt-0">
+                                    <a-checkbox  v-model="TruleForm.check_xieyi" @click="check_agree_dialog()">
+                                        同意《用户协议》
+                                    </a-checkbox>
+                                </a-form-item>
+
+                                <a-button type="primary" :loading="reg_loading" class="register w-100 mb-2"
+                                          html-type="submit">
+                                    注册
+                                </a-button>
+                            </a-form>
+                        </a-tab-pane>
+                    </a-tabs>
 
 
 
@@ -237,23 +247,36 @@
 
                 </div>
             </div>
+
         </div>
-    </el-dialog>
+    </a-modal>
 
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import { ElMessage } from 'element-plus'
+import {
+    IconUser,
+    IconLock,
+    IconCode,
+    IconMessage,
+    IconEmail,
+    IconMobile,
+
+} from "@arco-design/web-vue/es/icon";
 import { useCounter } from '~/store/counter'
+import {Message} from "@arco-design/web-vue";
 const counter = useCounter()
 const is_login_card = ref(true)
+import QrcodeVue from "qrcode.vue";
+const wx_ewm = ref()
 
 const go_regs = () => {
+    wx_ewm.value = ''
     is_login_card.value = false
 }
 const go_login = () => {
+    wx_ewm.value = ''
     is_login_card.value = true
 }
 
@@ -276,16 +299,14 @@ const handleCancel = () => {
     login_dialog.value = false
 }
 
-
-
 const email = ref('')
 const password = ref('')
-const ruleFormRefLogin = ref<FormInstance>()
+const ruleFormRefLogin = ref()
 const ruleFormLogin = reactive({
     email: '',
     password: ''
 })
-const rulesLogin = reactive<FormRules>({
+const rulesLogin = reactive({
     email: [
         { required: true, message: '请输入邮箱或手机号', trigger: 'blur' },
     ],
@@ -300,12 +321,11 @@ const user_info = useCookie('user_info')
 const router = useRouter()
 const cookie_message = useCookie('message')
 
-
-
-const submitFormLogin = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return
-    await formEl.validate((valid, fields) => {
-        if (valid) {
+const submitFormLogin = async ({values, errors}) => {
+            if (errors) {
+                Message.error('请填写登录信息')
+                return false
+            }
             login_loading.value = true
             logins({
                 email: ruleFormLogin.email,
@@ -317,28 +337,52 @@ const submitFormLogin = async (formEl: FormInstance | undefined) => {
                     cookie_message.value = ''
                     token.value = res._rawValue.token
                     user_info.value = res._rawValue.user_info
-                    ElMessage.success(res._rawValue.message)
+                    Message.success(res._rawValue.message)
                     router.go(0)
                 }
             }).catch((err: any) => {
                 login_loading.value = false
             })
-        } else {
-            console.log('error submit!', fields)
-        }
-    })
 }
 const { public: { baseUrl } } = useRuntimeConfig()
-
+const wechat_id = ref()
+const wx_login_is = ref(false)
 const wechat_login= ()=>{
-    window.location.href = baseUrl + 'api/socials/wechat'
+    is_login_card.value = false
+    wx_login_is.value = true
+    wechat_login_url({
+        type: 'login'
+    }).then((res: any) => {
+        wx_ewm.value = res._rawValue.data
+        wechat_id.value = res._rawValue.id
+        // 轮询是否已经关注登录
+        let timer = setInterval(() => {
+            wechat_login_status({
+                id:wechat_id.value
+            }).then((res: any) => {
+                if (res._rawValue.status == 200) {
+                    clearInterval(timer)
+                    cookie_message.value = ''
+                    token.value = res._rawValue.token
+                    user_info.value = res._rawValue.user_info
+                    Message.success(res._rawValue.message)
+                    router.go(0)
+                }
+            }).catch((err: any) => {
+                clearInterval(timer)
+            })
+        }, 3000)
+    }).catch((err: any) => {
+        Message.error(err);
+    })
 }
+const reg_way = ref(counter.setting.register_way?counter.setting.register_way:'1')
+
 // register send
-const reg_way = counter.setting.register_way
-const ruleFormRef = ref<FormInstance>()
-const ruleFormRefs = ref<FormInstance>()
+
+const ruleFormRef = ref()
+const ruleFormRefs = ref()
 const ruleForm = <any>reactive({
-    name: '',
     email: '',
     password: '',
     email_code: '',
@@ -347,7 +391,6 @@ const ruleForm = <any>reactive({
 
 })
 const TruleForm = <any>reactive({
-    name: '',
     phone: '',
     password: '',
     phone_code: '',
@@ -361,13 +404,11 @@ if (process.client) {
         TruleForm.invite_code = searchParams.get('invite_code')
     }
 }
-const rulest = reactive<FormRules>({
-    name: [
-        { required: true, message: '请输入用户名', trigger: 'blur' },
-    ],
+const rulest = reactive({
+
     phone: [
         { required: true, message: '请输入手机号', trigger: 'blur' },
-        { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: ['blur', 'change'] }
+        { match: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: ['blur', 'change'] }
     ],
     password: [
         { required: true, message: '请输入密码', trigger: 'blur' },
@@ -378,11 +419,12 @@ const rulest = reactive<FormRules>({
     ],
 
 })
+const check_agree_dialog=()=>{
+    check_dialog.value = true
+    get_agreement()
+}
+const rules = reactive({
 
-const rules = reactive<FormRules>({
-    name: [
-        { required: true, message: '请输入用户名', trigger: 'blur' },
-    ],
     email: [
         { required: true, message: '请输入邮箱地址', trigger: 'blur' },
         { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
@@ -399,25 +441,24 @@ const rules = reactive<FormRules>({
 })
 const reg_loading = ref(false)
 // EMAIL register
-const submitForm = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return
-    await formEl.validate((valid, fields) => {
-        if (valid) {
+const submitForm = async ({values, errors}) => {
+            if (errors) {
+                Message.error('请补全注册信息')
+                return false
+            }
             if (ruleForm.check_xieyi == false) {
-                ElMessage.error('请同意用户协议')
+                Message.error('请同意用户协议')
                 return
             }
             reg_loading.value = true
             register({
-                name: ruleForm.name,
                 email: ruleForm.email,
                 password: ruleForm.password,
                 email_code: ruleForm.email_code,
                 invite_code: ruleForm.invite_code
             }).then((res: any) => {
                 if (res._rawValue.status == 200) {
-                    ElMessage.success(res._rawValue.message)
-                    formEl.resetFields()
+                    Message.success(res._rawValue.message)
                     go_login()
                     reg_loading.value = false
                 }
@@ -425,47 +466,48 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             }).catch((err: any) => {
                 reg_loading.value = false
             })
-        } else {
-            console.log('error submit!', fields)
-        }
-    })
+
 }
 
 const check_dialog = ref(false)
 const agreement = ref({})
+const agreement_load = ref(false)
 const get_agreement=()=>{
+    agreement_load.value = true
     get_agreement_f().then((res: any) => {
         agreement.value = res._rawValue.data
+        agreement_load.value = false
     }).catch((err: any) => {
         console.log(err)
+        agreement_load.value = false
     })
 }
-get_agreement()
+
 const check_dialog_change = ()=>{
     check_dialog.value = false
     ruleForm.check_xieyi = true
     TruleForm.check_xieyi = true
 }
 // Phone register
-const submitFormS = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return
-    await formEl.validate((valid, fields) => {
-        if (valid) {
+const submitFormS = async ({values, errors}) => {
+            if (errors) {
+                Message.error('请补全注册信息')
+                return false
+            }
             if (TruleForm.check_xieyi == false) {
-                ElMessage.error('请同意用户协议')
+                Message.error('请同意用户协议')
                 return
             }
             reg_loading.value = true
             register({
-                name: TruleForm.name,
                 phone: TruleForm.phone,
                 password: TruleForm.password,
                 phone_code: TruleForm.phone_code,
                 invite_code: TruleForm.invite_code
             }).then((res: any) => {
                 if (res._rawValue.status == 200) {
-                    ElMessage.success(res._rawValue.message)
-                    formEl.resetFields()
+                    Message.success(res._rawValue.message)
+
                     go_login()
                     reg_loading.value = false
                 }
@@ -473,10 +515,7 @@ const submitFormS = async (formEl: FormInstance | undefined) => {
             }).catch((err: any) => {
                 reg_loading.value = false
             })
-        } else {
-            console.log('error submit!', fields)
-        }
-    })
+
 }
 const send_code_text = ref('发送验证码')
 const send_wait = ref(false)
@@ -484,7 +523,7 @@ const activeName = reg_way === '1' ? 'first' : (reg_way == '2' ? 'second' : 'fir
 
 const send_code = () => {
     if (ruleForm.email == '') {
-        ElMessage.error('请填写邮箱')
+        Message.error('请填写邮箱')
         return
     }
     send_wait.value = true
@@ -492,7 +531,7 @@ const send_code = () => {
         email: ruleForm.email
     }).then((res: any) => {
         if (res._rawValue.status == 200) {
-            ElMessage.success(res._rawValue.message)
+            Message.success(res._rawValue.message)
             // 发送成功倒计时60秒
             let time = 60
             const timer = setInterval(() => {
@@ -515,7 +554,7 @@ const send_code = () => {
 
 const send_p_code = () => {
     if (TruleForm.phone == '') {
-        ElMessage.error('请填写手机号')
+        Message.error('请填写手机号')
         return
     }
     send_wait.value = true
@@ -523,7 +562,7 @@ const send_p_code = () => {
         phone: TruleForm.phone
     }).then((res: any) => {
         if (res._rawValue.status == 200) {
-            ElMessage.success(res._rawValue.message)
+            Message.success(res._rawValue.message)
             // 发送成功倒计时60秒
             let time = 60
             const timer = setInterval(() => {
@@ -546,13 +585,6 @@ const send_p_code = () => {
 </script>
 
 <style>
-.dialog_login .el-button {
-    width: 100%;
-}
-
-.el-dialog.dialog_login_of {
-    width: 25%;
-}
 
 .dialog_login_of i {
     font-size: 16px;
