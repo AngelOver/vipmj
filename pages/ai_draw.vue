@@ -1145,7 +1145,7 @@ const get_me_d = () => {
         if (check_time.value) {
             time_set.value = setTimeout(() => {
                 get_me_d();
-            }, 3000);
+            }, 15000);
         }
         for (let i = 0; i < me_draw.value.length; i++) {
             srcList.value.push(me_draw.value[i].image)

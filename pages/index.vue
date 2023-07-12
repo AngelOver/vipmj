@@ -90,17 +90,17 @@
                     @change="handleCurrentChange"
                     :hide-on-single-page=true
                 />
-                <client-only>
-                    <a-popconfirm content="此操作将永久删除所有会话,确定要删除吗?" @ok="delete_all" type="warning">
-                        <a-button type="primary" class="w-11/12 flex m-auto mb-2">
-                            <template #icon>
-                                <icon-delete/>
-                            </template>
-                            <!-- Use the default slot to avoid extra spaces -->
-                            <template #default>清空所有对话</template>
-                        </a-button>
-                    </a-popconfirm>
-                </client-only>
+<!--                <client-only>-->
+<!--                    <a-popconfirm content="此操作将永久删除所有会话,确定要删除吗?" @ok="delete_all" type="warning">-->
+<!--                        <a-button type="primary" class="w-11/12 flex m-auto mb-2">-->
+<!--                            <template #icon>-->
+<!--                                <icon-delete/>-->
+<!--                            </template>-->
+<!--                            &lt;!&ndash; Use the default slot to avoid extra spaces &ndash;&gt;-->
+<!--                            <template #default>清空所有对话</template>-->
+<!--                        </a-button>-->
+<!--                    </a-popconfirm>-->
+<!--                </client-only>-->
             </a-spin>
             <a-modal v-model:visible="beizhu_info" title="修改备注" @ok="handle_send">
                 <a-input v-model="beizhu"/>
@@ -203,7 +203,7 @@
                                 VIP剩余 <a-tag color="arcoblue" class="ml-1 mr-1"> {{ last_msg }}</a-tag>次问答
                             </div>
                             <div v-else>
-                                升级会员
+
                             </div>
                         </a-button>
 
@@ -434,8 +434,10 @@
 
                                         </div>
                                         <!--scene show end-->
-                                        <p class="mt-4 text-center text-sm text-neutral-400">
-                                            点击以上话题，快速与我对话</p></div>
+<!--                                        <p class="mt-4 text-center text-sm text-neutral-400">-->
+<!--                                            点击以上话题，快速与我对话</p>-->
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -815,17 +817,17 @@
                         @change="handleCurrentChange"
                         :hide-on-single-page=true
                     />
-                    <client-only>
-                        <a-popconfirm content="此操作将永久删除所有会话,确定要删除吗?" @ok="delete_all" type="warning">
-                            <a-button type="primary" class="w-11/12 flex m-auto mb-2">
-                                <template #icon>
-                                    <icon-delete/>
-                                </template>
-                                <!-- Use the default slot to avoid extra spaces -->
-                                <template #default>清空所有对话</template>
-                            </a-button>
-                        </a-popconfirm>
-                    </client-only>
+<!--                    <client-only>-->
+<!--                        <a-popconfirm content="此操作将永久删除所有会话,确定要删除吗?" @ok="delete_all" type="warning">-->
+<!--                            <a-button type="primary" class="w-11/12 flex m-auto mb-2">-->
+<!--                                <template #icon>-->
+<!--                                    <icon-delete/>-->
+<!--                                </template>-->
+<!--                                &lt;!&ndash; Use the default slot to avoid extra spaces &ndash;&gt;-->
+<!--                                <template #default>清空所有对话</template>-->
+<!--                            </a-button>-->
+<!--                        </a-popconfirm>-->
+<!--                    </client-only>-->
                 </a-spin>
                 <a-modal v-model:visible="beizhu_info" title="修改备注" @ok="handle_send">
                     <a-input v-model="beizhu"/>
@@ -910,7 +912,7 @@
                                         class="absolute -right-0.75 -bottom-0.75 w-4.5 h-4.5 rounded-full border-4 border-n-6 bg-green-300 top-1 border-green-300"></div>
                                 </div>
                                 <div class="ml-1 mr-2">
-                                    <div class="base2 font-semibold text-n-1 text-truncate">请先登录</div>
+                                    <div class="base2 font-semibold text-n-1 text-truncate">登录</div>
                                 </div>
                                 <div
                                     class="shrnik-0 ml-auto self-start px-3 bg-primary-2 rounded-lg caption1 font-bold text-n-7 pack_tag_vip">
