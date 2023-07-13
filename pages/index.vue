@@ -1273,11 +1273,11 @@ const all_message = () => {
     }).catch((err: any) => {
         data_load.value = false
         left_loding.value = false
-        console.log(err)
+        console.log(err+"err")
     })
 }
 const user_info = ref({}) as any
-const vip_level = ref('free')
+const vip_level = ref('')
 const save_message_img = (ext:any)=>{
     let node = document.querySelector(".all_message_export");
     // 设置node节点overflow:hidden
